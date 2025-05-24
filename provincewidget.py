@@ -87,7 +87,7 @@ class ProvinceWidget(QWidget):
 
     # 介绍功能
     def onIntroduceClicked(self):
-        dialog = InfoDialog(self.provincename, self)
+        dialog = InfoDialog(self.provincename, self.provincename, self)
         dialog.exec_()
         
     # 知识问答功能（示例占位）
@@ -103,7 +103,7 @@ class ProvinceWidget(QWidget):
         self.cities[name].set_icon(self.cities[name].times)
 
     def resetcity(self, cityname):
-        with open('resources/data/'+self.provincename+'.json','r') as f:
+        with open('resources/data/'+self.provincename+'.json','r',encoding='utf-8') as f:
             data = json.load(f)
         self.cities[cityname].set_icon(data[cityname])
         self.cities[cityname].times = data[cityname]

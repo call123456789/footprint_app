@@ -48,7 +48,7 @@ class ChinaWidget(QWidget):
         self.provinces[name].set_icon(self.provinces[name].times)
 
     def resetprovince(self, name):
-        with open('resources/data/province.json','r') as f:
+        with open('resources/data/province.json','r',encoding='utf-8') as f:
             data = json.load(f)
         self.provinces[name].set_icon(data[name])
         self.provinces[name].times = data[name]
