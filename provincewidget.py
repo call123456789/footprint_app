@@ -1,10 +1,12 @@
-from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
+from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QMessageBox
 from PyQt5.QtGui import QPixmap, QPalette, QBrush
 from citybutton import CityButton
 from PyQt5.QtCore import Qt
 import json
 from infodialog import InfoDialog
 from aibutton import AIButton
+from llm_knowledge import LLM_knowledge
+from quizwindow import QuizWindow
 
 class ProvinceWidget(QWidget):
     def __init__(self, parent=None, provincename="",pre=None):
@@ -30,23 +32,45 @@ class ProvinceWidget(QWidget):
         spacing = 20
         x = 1200 - button_width - 20  # 右侧边距20px
 
+        btns = []
         # 返回按钮
         self.btn_return = QPushButton("返回", self)
         self.btn_return.setFixedSize(button_width, button_height)        
         self.btn_return.clicked.connect(self.onReturnClicked)
         self.btn_return.move(x, 10)
+        btns.append(self.btn_return)
 
         # 介绍按钮
         self.btn_intr = QPushButton("介绍", self)
         self.btn_intr.setFixedSize(button_width, button_height)
         self.btn_intr.clicked.connect(self.onIntroduceClicked)
         self.btn_intr.move(x, 10 + button_height + spacing)
+        btns.append(self.btn_intr)
 
         # 知识问答按钮
         self.btn_quiz = QPushButton("知识问答", self)
         self.btn_quiz.setFixedSize(button_width, button_height) 
         self.btn_quiz.clicked.connect(self.onQuizClicked)
         self.btn_quiz.move(x, 10 + 2*(button_height + spacing))
+        btns.append(self.btn_quiz)
+
+        for btn in btns:
+            btn.setStyleSheet("""
+                QPushButton {
+                    border-radius: 15px;
+                    border: 2px solid black;
+                    color: black;
+                    background-color: white;
+                    font-size: 16px;
+                }
+                QPushButton:hover {
+                    background-color: #f0f0f0;
+                    border: 2px solid #404040;
+                }
+                QPushButton:pressed {
+                    background-color: #e0e0e0;
+                }
+            """)
 
         # 加载城市按钮逻辑
         with open('resources/data/'+provincename+'.json', 'r', encoding='utf-8') as f:
@@ -90,9 +114,10 @@ class ProvinceWidget(QWidget):
         dialog = InfoDialog(self.provincename, self.provincename, self)
         dialog.exec_()
         
-    # 知识问答功能（示例占位）
+    # 知识问答功能
     def onQuizClicked(self):
-        print("知识问答")
+        self.quiz_window = QuizWindow(self.provincename)
+        self.quiz_window.show()
 
     def highlight_city(self, name):
         self.position_label.setText(f"当前位置：{name}")  # 更新文本框内容

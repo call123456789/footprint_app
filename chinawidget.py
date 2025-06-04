@@ -1,13 +1,25 @@
-from PyQt5.QtWidgets import QWidget, QLabel
+from PyQt5.QtWidgets import QWidget, QLabel,QPushButton
 from provincebutton import ProvinceButton
 import json
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap, QPalette, QBrush
 from aibutton import AIButton
+from plandialog import PlanDialog
 
 class ChinaWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFixedSize(1200, 686)
         self.provinces = {}
+        self.setAutoFillBackground(True)
+        palette = self.palette()
+        pixmap = QPixmap("resources/background/china.png").scaled(  # 添加缩放处理
+            self.size(), 
+            Qt.IgnoreAspectRatio,  # 忽略宽高比
+            Qt.SmoothTransformation  # 启用平滑缩放
+        )
+        palette.setBrush(QPalette.Window, QBrush(pixmap))
+        self.setPalette(palette)
         
         with open('resources/data/province.json', 'r', encoding='utf-8') as f:
             dict = json.load(f)
@@ -38,6 +50,34 @@ class ChinaWidget(QWidget):
         self.aibutton = AIButton(self)
         self.aibutton.move(1100, 540)
 
+        button_width = 150
+        button_height = 50
+        spacing = 20
+        x = 1200 - button_width - 20
+
+
+        # 创建生成计划按钮
+        self.plan_button = QPushButton("生成计划", self)
+        self.plan_button.setFixedSize(button_width, button_height)
+        self.plan_button.move(x, 10)
+        self.plan_button.clicked.connect(self.show_plan_dialog)
+        self.plan_button.setStyleSheet("""
+                QPushButton {
+                    border-radius: 15px;
+                    border: 2px solid black;
+                    color: black;
+                    background-color: white;
+                    font-size: 16px;
+                }
+                QPushButton:hover {
+                    background-color: #f0f0f0;
+                    border: 2px solid #404040;
+                }
+                QPushButton:pressed {
+                    background-color: #e0e0e0;
+                }
+            """)
+
 
     def highlight_province(self, name):        
         self.position_label.setText(f"当前位置：{name}")  # 更新文本框内容
@@ -52,3 +92,8 @@ class ChinaWidget(QWidget):
             data = json.load(f)
         self.provinces[name].set_icon(data[name])
         self.provinces[name].times = data[name]
+
+    def show_plan_dialog(self):
+        """显示生成计划对话框"""
+        dialog = PlanDialog(self)
+        dialog.exec_()
